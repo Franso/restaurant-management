@@ -87,6 +87,11 @@ func CreateMenu() gin.HandlerFunc {
 	}
 }
 
+// Checks if the  end date is after the start date and if so returns a false
+func inTimeSpan(start, end, check time.Time) bool {
+	return start.After(time.Now()) && end.After(start)
+}
+
 func UpdateMenu() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
