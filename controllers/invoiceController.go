@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	"context"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/franso/restaurant-management/database"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -23,7 +27,20 @@ var invoiceCollection *mongo.Collection = database.OpenCollection(database.Clien
 
 func GetInvoices() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		result, err := invoiceCollection.Find(ctx, bson.M{})
+		defer cancel()
 
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while fetching invoices"})
+		}
+
+		var allInvoices []bson.M
+		if err = result.All(ctx, &allInvoices); err != nil {
+			log.Fatal(err)
+		}
+
+		c.JSON(http.StatusOK, allInvoices)
 	}
 }
 
