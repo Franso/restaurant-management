@@ -1,3 +1,3 @@
 package middleware
 
-func Authentication() {}
+func Authentication() gin.Handler {}
