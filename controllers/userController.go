@@ -11,6 +11,7 @@ import (
 	"github.com/franso/restaurant-management/database"
 	helper "github.com/franso/restaurant-management/helpers"
 	"github.com/franso/restaurant-management/models"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -194,10 +195,22 @@ func Login() gin.HandlerFunc {
 }
 
 func HashPassword(password string) string {
-	var res string
-	return res
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		log.Panic(err)
+	}
+	return string(bytes)
 }
 
 func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
-	return true, ""
+	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
+	check := true
+	msg := ""
+
+	if err != nil {
+		msg = fmt.Sprintf("login or password is incorrect")
+		check = false
+	}
+
+	return check, msg
 }
