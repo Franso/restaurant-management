@@ -156,15 +156,40 @@ func SignUp() gin.HandlerFunc {
 
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var user models.User
+
+		var foundUser models.User
+
 		// convert the login data from postman which is in json to Go lang readable format
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 
 		// find a user with that email and see if the user exists
+		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "user not found, login seems to be incorrect"})
+			return
+		}
 
 		// then if user exists, verify the password
+		passwordIsValid, msg := VerifyPassword(*user.Password, *foundUser.Password)
+		defer cancel()
+		if passwordIsValid != true {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
 
 		// if all goes weel, generate tokens and update tokens
+		token, refreshToken := helper.GenerateAllTokens(*foundUser.Email, *foundUser.First_name, *foundUser.Last_name, foundUser.User_id)
 
+		// update tokens - token and refresh tokens
+		helper.UpdateAllTokens(token, refreshToken, foundUser.User_id)
 		// return StatusOK
+		c.JSON(http.StatusOK, foundUser)
 	}
 }
 
@@ -173,6 +198,6 @@ func HashPassword(password string) string {
 	return res
 }
 
-func VerifyPassword(userPassword string, providedPassword string) bool {
-	return true
+func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
+	return true, ""
 }
