@@ -1,6 +1,8 @@
 package helpers
 
-func GenerateAllTokens() {}
+func GenerateAllTokens() {
+	
+}
 
 func UpdateAllTokens() {}
 
