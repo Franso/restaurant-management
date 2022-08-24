@@ -137,7 +137,7 @@ func SignUp() gin.HandlerFunc {
 		user.User_id = user.ID.Hex()
 		// generate and refresh token from helper
 
-		token, refreshToken := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, user.User_id)
+		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, user.User_id)
 		user.Token = &token
 		user.Refresh_Token = &refreshToken
 
