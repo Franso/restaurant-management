@@ -1,6 +1,6 @@
 # Restaurant Management System
 
-Backend built in Go Lang for a restaurant management system.
+Complete restaurant backend built in Go Lang for a restaurant management system.
 
 ## Features
 
