@@ -21,10 +21,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// initialize a food database
 var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "food")
 
 var validate = validator.New()
 
+// Get all foods using mongo db aggregation
 func GetFoods() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
